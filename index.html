@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp QR Code</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f4f4f4;
+        }
+        #qrcode {
+            text-align: center;
+        }
+        #status {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="qrcode">
+        <h1>Scan QR Code to Log In</h1>
+        <img id="qr-image" src="" alt="QR Code" />
+        <p id="status"></p>
+    </div>
+
+    <script>
+        const socket = io();
+
+        socket.on('qr', (qr) => {
+            document.getElementById('qr-image').src = qr;
+            document.getElementById('qr-image').style.display = 'block';
+            document.getElementById('status').innerText = 'Please scan the QR code.';
+        });
+
+        socket.on('ready', (message) => {
+            document.getElementById('status').innerText = message;
+            document.getElementById('qr-image').style.display = 'none';  // Hide the QR code image
+        });
+
+        socket.on('disconnected', (message) => {
+            document.getElementById('status').innerText = message;
+            document.getElementById('qr-image').style.display = 'none';  // Hide the QR code image
+        });
+
+        window.addEventListener('load', () => {
+            socket.emit('checkStatus');
+        });
+    </script>
+</body>
+</html>
